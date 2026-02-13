@@ -1,0 +1,266 @@
+============================================================
+CLINERULES — PERSISTENT AGENT INSTRUCTIONS
+============================================================
+This is the persistent instruction set for the Taito System
+Lancer Worldbuilding Memory System. Read this file in full
+at the start of every session.
+============================================================
+
+------------------------------------------------------------
+SECTION 1: THREE-TIER + SIDECAR ARCHITECTURE
+------------------------------------------------------------
+
+This repository is a structured knowledge base, not a
+software application. It uses a strict information hierarchy
+to manage token budgets and ensure reliable context loading.
+
+TIER 1 — SPINE (spine/)
+  Purpose: Current campaign state — "where are we now."
+  File: spine/current-state.md
+  Load: ALWAYS. Part of baseline context for every query.
+  Token budget: ~300-500 tokens.
+  Volatility: High — updated after every session.
+  Scope: Campaign-specific. Resets between campaigns.
+
+TIER 2 — INDEX (index/)
+  Purpose: Scannable entity inventory. Maps names to
+  categories, statuses, and lore entry paths.
+  Files: factions.md, locations.md, npcs.md, events.md
+  Load: ALWAYS. Part of baseline context for every query.
+  Token budget: ~400-600 tokens (all 4 files).
+  Format: Markdown tables with YAML frontmatter.
+  Key rule: Every Tier 3 entry MUST have a row here.
+
+TIER 3 — LORE (lore/)
+  Purpose: Deep canonical entries organized by category.
+  Subdirectories: locations/, factions/, npcs/, events/, cultures/
+  Load: ON DEMAND. Load only the entries relevant to the
+    current query or encoding operation.
+  Token budget: ~200-2000 tokens per entry.
+  Format: YAML frontmatter + markdown sections.
+  Key rule: Every entry MUST be created from a template.
+
+SIDECAR (sidecar/)
+  Purpose: Cross-cutting context.
+  Files:
+    lexicon.md — Universe vocabulary and terminology.
+      Campaign-agnostic. Serves as incubation space for
+      concepts not yet worthy of full Tier 3 entries.
+    threads.md — Campaign-specific narrative connections
+      linking PCs, NPCs, locations, and events.
+      Campaign-specific. Volatile.
+  Load: ALWAYS. Part of baseline context for every query.
+  Token budget: ~300-500 tokens (both files).
+
+TEMPLATES (templates/)
+  Purpose: Structural blueprints for creating new entries.
+  Load: NEVER during queries. Load only when creating new
+    entries during the encoding workflow.
+  Files: 7 templates + README.md + GUIDE.md
+
+BASELINE CONTEXT (loaded for every query):
+  1. Spine: spine/current-state.md
+  2. Index: index/factions.md, index/locations.md,
+     index/npcs.md, index/events.md
+  3. Sidecar: sidecar/lexicon.md, sidecar/threads.md
+  Total: ~1500-2000 tokens
+
+------------------------------------------------------------
+SECTION 2: ENCODING PROTOCOL (8 STEPS)
+------------------------------------------------------------
+
+Use this protocol whenever the GM triggers an encoding
+operation. The GM will use a trigger phrase such as "encode
+this," "commit this lore," "lock this in," or similar.
+
+STEP 1 — SUMMARIZE
+  Summarize what you believe became canon from the
+  conversation. Present as a numbered list. Ask the GM
+  to confirm or correct your understanding.
+
+STEP 2 — CLASSIFY
+  Determine the entry type for each new fact:
+    - location, faction, npc, event, or culture
+  For ambiguous items, propose a primary type AND a
+  secondary framing with reasoning. Ask the GM to decide.
+
+STEP 3 — DECIDE DEPTH
+  For each item, determine whether it should be:
+    - A Lexicon term (sidecar/lexicon.md) — brief definition
+    - A full Tier 3 entry (lore/<category>/) — deep canonical
+  If ambiguous, ask the GM which to use.
+
+STEP 4 — IDENTIFY IMPACTS
+  List all changes this encoding will require:
+    - New entries (files to create)
+    - Modified entries (files to update)
+    - Index rows to add or update
+    - Cross-reference additions or fixes
+    - Sidecar updates (lexicon terms, threads)
+
+STEP 5 — REPO-RESILIENCE CHECK
+  Before staging, RE-READ every document you are about to
+  modify. The GM may have manually edited files since your
+  last read. Never stage changes based on stale data.
+  This step is mandatory. Do not skip it.
+
+STEP 6 — HYBRID STAGING
+  Present the staged changes in hybrid format:
+    - Overview: Summary of all changes
+    - NEW files: Full content (complete file)
+    - MODIFIED files: Changed sections only (with enough
+      surrounding context for the GM to verify placement)
+  This is the proposal. Nothing is written until approved.
+
+STEP 7 — GM APPROVAL
+  Wait for the GM to approve the staging. The GM may:
+    - Approve as-is
+    - Request adjustments (go back to step 6)
+    - Decline specific items (remove from staging)
+  Do not proceed until you have explicit approval.
+
+STEP 8 — COMMIT
+  Write exactly what was staged. Nothing more, nothing less.
+  Do not rephrase, improve, or add to approved content.
+  After committing, confirm what was written.
+
+------------------------------------------------------------
+SECTION 3: CARDINAL RULES
+------------------------------------------------------------
+
+These rules are inviolable. They apply to every interaction
+regardless of context.
+
+RULE 1: NO CREATIVE EDITS POST-APPROVAL
+  Once the GM approves a staging proposal, commit exactly
+  what was staged. Do not add creative flourishes, rephrase
+  for "clarity," or introduce content that was not in the
+  approved staging. This is the most important rule.
+
+RULE 2: ALWAYS USE TEMPLATES
+  Every new Tier 3 entry (lore/<category>/) must be created
+  from the appropriate template in templates/. Do not
+  create entries with ad hoc structures. Load the template,
+  fill in the fields, and follow all inline comments.
+
+RULE 3: ALWAYS UPDATE CROSS-REFERENCES
+  When creating or modifying an entry, check every
+  reference it contains and every reference that points
+  to it. Update stale or missing cross-references as part
+  of the same staging set.
+  Cross-references use type-prefixed slugs:
+    faction:crimson-fleet
+    location:seicoe-station
+    npc:commander-voss
+    event:battle-of-mirren
+    culture:daysail-nomads
+
+RULE 4: ALWAYS UPDATE THE INDEX
+  Every Tier 3 entry must have a corresponding row in its
+  category's index file (index/factions.md, index/locations.md,
+  index/npcs.md, index/events.md). When you create, modify,
+  or delete a Tier 3 entry, update the index in the same
+  staging set.
+
+------------------------------------------------------------
+SECTION 4: CROSS-REFERENCE MAINTENANCE
+------------------------------------------------------------
+
+FORMAT:
+  References use type-prefixed slugs:
+    <type>:<slug>
+  Where <type> is one of: location, faction, npc, event, culture
+  And <slug> is lowercase, hyphen-separated.
+
+WHERE REFERENCES APPEAR:
+  - YAML frontmatter "references" arrays in Tier 3 entries
+  - Sidecar lexicon entries ("See: [type:slug]")
+  - Sidecar thread entries ("Relevant entries: [type:slug, ...]")
+  - Index table "Lore Entry" column
+
+RESOLUTION:
+  To resolve a reference:
+    1. Parse the type prefix to determine the category
+    2. Look up the slug in the corresponding index file
+    3. Navigate to the lore entry at lore/<category>/<slug>.md
+
+MAINTENANCE RULES:
+  - When creating a new entry: add references FROM the new
+    entry to related entities, AND add references TO the new
+    entry from related entities (bidirectional).
+  - When modifying an entry: verify all existing references
+    still point to valid entries. Flag any broken references.
+  - When deleting an entry: remove all references TO the
+    deleted entry from other documents. Remove its index row.
+  - During any staging: include a "Cross-Reference Fixes"
+    section if you detect inconsistencies (one-way references,
+    missing entries, stale index rows, conflicting metadata).
+
+CONSISTENCY CHECKS:
+  - Every entry in lore/<category>/<slug>.md should have a
+    matching row in index/<category>.md.
+  - Every slug in a "references" array should resolve to an
+    existing entry.
+  - Every lexicon entry with a "See:" reference should point
+    to an existing entry.
+  - Every thread entry's "Relevant entries:" should resolve.
+
+------------------------------------------------------------
+SECTION 5: FIRST-USE ORIENTATION
+------------------------------------------------------------
+
+When you first encounter this repository (or when starting
+a new session):
+
+  1. Read this file (.clinerules) in full.
+  2. Read the root README.md for architecture overview.
+  3. For any directory you are about to work in, read that
+     directory's README.md first.
+  4. Load baseline context: Spine + Index + Sidecar.
+  5. Proceed with the GM's query or encoding request.
+
+------------------------------------------------------------
+SECTION 6: STAGING FORMAT (HYBRID)
+------------------------------------------------------------
+
+When presenting changes for GM approval, use this format:
+
+  === STAGING OVERVIEW ===
+  [Summary: what is changing and why]
+
+  === NEW FILES ===
+  [For each new file: full path and complete content]
+
+  === MODIFIED FILES ===
+  [For each modified file: full path, changed section(s)
+   with surrounding context markers]
+
+  === CROSS-REFERENCE FIXES ===
+  [Any cross-reference corrections, if applicable]
+
+  === INDEX UPDATES ===
+  [Any index table row additions or modifications]
+
+The GM will approve, adjust, or decline. Do not write
+anything until approval is received.
+
+------------------------------------------------------------
+SECTION 7: QUERY BEHAVIOR
+------------------------------------------------------------
+
+When the GM asks a lore question:
+
+  1. Load baseline context (Spine + Index + Sidecar).
+  2. Parse the question to identify relevant entities.
+  3. Load only the Tier 3 entries needed to answer.
+  4. Follow cross-references to related entries if needed.
+  5. Answer conversationally with moderate citations:
+     "Entity Name (Category) entry states..."
+  6. If an entity is missing from the knowledge base, ask:
+     - Is this an existing element not yet recorded?
+     - Is this a new element being invented now?
+     - Is this a session-only detail (no recording needed)?
+
+------------------------------------------------------------
+END OF CLINERULES
+------------------------------------------------------------

@@ -1,0 +1,41 @@
+# ==========================
+# OS-generated files
+# ==========================
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+ehthumbs_vista.db
+
+# ==========================
+# Editor / IDE configs
+# ==========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+*.sublime-project
+*.sublime-workspace
+.vs/
+
+# ==========================
+# Temporary files
+# ==========================
+*.tmp
+*.bak
+~$*
+*.orig
+*.log
+
+# ==========================
+# System files
+# ==========================
+*.lnk
+Icon?
+.Spotlight-V100
+.Trashes
+._*
